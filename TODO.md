@@ -9,4 +9,4 @@
 - [ ] Invent dialogues for different characters that will "challenge" player for races
 
 ## Fix
-- [ ] Correctly set markers
+- [x] Correctly set markers

@@ -6,7 +6,7 @@ registerForEvent('onInit', function()
     Reset();
     ElapsedDelta = 0;
     Debug = true;
-    PlaceMapPin(Race.Start);
+    PlaceMapPinFromTable(Race.Start);
     print('RacePunk initialized');
 end)
 
@@ -15,7 +15,7 @@ registerForEvent('onUpdate', function(timeDelta)
         Race.Started = PlayerIsInPosition(Race.Start);
         if (Race.Started) then
             print("The Race has started");
-            PlaceMapPin(Race.End);
+            PlaceMapPinFromTable(Race.End);
         end
     elseif (Race.Started) then
         Race.Won = PlayerIsInPosition(Race.End);
@@ -53,8 +53,8 @@ end
 
 function NewRace()
     return {
-        Start = { x = -1235.5713, y = 1536.0328, z = 22.620506, w = 1 },
-        End = { x = -1249.5834, y = 1457.5667, z = 20.801819, w = 1 },
+        Start = {x = -1235.5713,y = 1536.0328,z = 22.620506,w = 1},
+        End = {x = -1249.5834,y = 1457.5667,z = 20.801819,w = 1},
         Reward = 0,
         Started = false,
         Accepted = false,
@@ -82,6 +82,10 @@ end
 
 function CheckRaceFinished()
     print('checking');
+end
+
+function PlaceMapPinFromTable(tbl)
+    return PlaceMapPin(tbl.x, tbl.y, tbl.z, tbl.w);
 end
 
 function PlaceMapPin(x, y, z, w) -- from CET Snippets discord
