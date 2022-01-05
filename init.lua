@@ -3,35 +3,35 @@
 --A simple mod to bring racing (back) to Cyberpunk 2077
 
 registerForEvent('onInit', function()
-    Reset();
+    MyPins = {};
     ElapsedDelta = 0;
     Debug = true;
-    PlaceMapPinFromTable(Race.Start);
+    Race = nil;
     print('RacePunk initialized');
 end)
 
 registerForEvent('onUpdate', function(timeDelta)
-    if (not Race.Started) then
-        Race.Started = PlayerIsInPosition(Race.Start);
-        if (Race.Started) then
-            print("The Race has started");
-            PlaceMapPinFromTable(Race.End);
+    if Race then
+        if (not Race.Started) then
+            Race.Started = PlayerIsInPosition(Race.Start);
+            if (Race.Started) then
+                StartRace();
+            end
+        elseif (Race.Started) then
+            Race.Finished = PlayerIsInPosition(Race.End);
+            if Race.Finished then
+                EndRace();
+            end
         end
-    elseif (Race.Started) then
-        Race.Won = PlayerIsInPosition(Race.End);
-        if Race.Won then
-            print('You won the Race');
-            Reset();
-        end
-    end
-    ElapsedDelta = ElapsedDelta + timeDelta
-    if ElapsedDelta >= 0.5 then
-        ElapsedDelta = 0;
+        --ElapsedDelta = ElapsedDelta + timeDelta
+        --if ElapsedDelta >= 0.5 then
+        --    ElapsedDelta = 0;
+        --end
     end
 end)
 
 registerHotkey('find_race', 'Find a new Race', function()
-    Reset(); --TODO: Instead of just resetting, actually find a race that is nearby
+    GetRace();
 end)
 
 registerHotkey('accept_race', 'Accept a Race', function()
@@ -39,26 +39,59 @@ registerHotkey('accept_race', 'Accept a Race', function()
 end)
 
 registerHotkey('cancel_race', 'Cancel the current Race', function()
-    Reset();
+    UnsetMappins();
 end)
 
-registerHotkey('my_hotkey', 'Test', function()
-    placeMapPin(-457.066, 940.031, 64.940, 1);
-    print(GetPlayerPosition());
-end)
-
-function Reset() --Reset the mod
+function GetRace() --Step 1
     Race = NewRace();
+    Race.Start.pin = PlaceMapPinFromTable(Race.Start);
+    table.insert(MyPins, Race.Start.pin);
+end
+
+function StartRace() --Step 2
+    UnsetMappin(Race.Start.pin);
+    Race.End.pin = PlaceMapPinFromTable(Race.End);
+    table.insert(MyPins, Race.End.pin);
+    print("The Race has started");
+end
+
+function EndRace() --Step 3
+    print('You won the Race');
+    UnsetMappins();
+end
+
+function UnsetMappin(pin)
+    Game.GetMappinSystem():UnregisterMappin(pin);
+    local PinIndex = IndexOf(pin);
+    if (PinIndex ~= nil) then
+        MyPins[PinIndex] = nil;
+    end
+end
+
+function UnsetMappins()
+    for key, pin in pairs(MyPins) do
+        UnsetMappin(pin);
+    end
+    MyPins = {};
+end
+
+function IndexOf(tbl, val)
+    for i, v in ipairs(tbl) do
+        if v == val then
+            return i
+        end
+    end
+    return nil
 end
 
 function NewRace()
     return {
-        Start = {x = -1235.5713,y = 1536.0328,z = 22.620506,w = 1},
-        End = {x = -1249.5834,y = 1457.5667,z = 20.801819,w = 1},
+        Start = {x = -1235.5713,y = 1536.0328,z = 22.620506,w = 1, pin = nil},
+        End = {x = -1249.5834,y = 1457.5667,z = 20.801819,w = 1, pin = nil},
         Reward = 0,
-        Started = false,
         Accepted = false,
-        Won = false,
+        Started = false,
+        Finished = false,
     }
 end
 
