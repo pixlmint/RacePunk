@@ -12,6 +12,7 @@ registerForEvent('onInit', function()
     ElapsedDelta = 0;
     Debug = true;
     Race = nil;
+    MeasuringRace = nil;
     print('RacePunk initialized');
 end)
 
@@ -29,6 +30,9 @@ registerForEvent('onUpdate', function(timeDelta)
             end
         end
     end
+    if (MeasuringRace) then
+        MeasuringRace.Time = MeasuringRace.Time + timeDelta;
+    end
 end)
 
 registerHotkey('find_race', 'Find a new Race', function()
@@ -39,6 +43,23 @@ registerHotkey('cancel_race', 'Cancel the current Race', function()
     UnsetMappins();
     Race = nil;
     HUDMessage('Successfully cancelled the race');
+end)
+
+registerHotkey('dev_set_start', 'Set this as the start point for a race', function()
+    MeasuringRace = {
+        Start = GetPlayerPosition(),
+        End = nil,
+        Time = 0,
+    }
+end)
+
+registerHotkey('dev_set_end', 'The race is finished here', function()
+    MeasuringRace.End = GetPlayerPosition();
+    print('START: ' .. CoordsToString(MeasuringRace.Start) .. "\nEnd: " .. CoordsToString(MeasuringRace.End) .. "\nTIME: " .. MeasuringRace.Time);
+end)
+
+registerHotkey('dev_cancel_recording', 'Cancel recording a new race', function()
+    MeasuringRace = nil;
 end)
 
 function GetRace() --Step 1
@@ -140,4 +161,8 @@ function HUDMessage(msg) --from 'Hidden Packages' mod
 
 	GameHUD.ShowMessage(HUDMessage_Current)
 	HUDMessage_Last = os:clock()
+end
+
+function CoordsToString(pos)
+    return 'x=' .. pos.x .. ', y=' .. pos.y .. ',z=' .. pos.z .. ',w=' .. pos.w;
 end
