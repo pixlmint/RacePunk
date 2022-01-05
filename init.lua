@@ -39,12 +39,10 @@ registerHotkey('find_race', 'Find a new Race', function()
     GetRace();
 end)
 
-registerHotkey('accept_race', 'Accept a Race', function()
-    Race.Accepted = true;
-end)
-
 registerHotkey('cancel_race', 'Cancel the current Race', function()
     UnsetMappins();
+    Race = nil;
+    HUDMessage('Successfully cancelled the race');
 end)
 
 function GetRace() --Step 1
