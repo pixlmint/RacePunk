@@ -2,6 +2,11 @@
 --Version 0.1
 --A simple mod to bring racing (back) to Cyberpunk 2077
 
+local GameHUD = require('Modules/GameHUD.lua');
+
+local HUDMessage_Current = ""
+local HUDMessage_Last = 0
+
 registerForEvent('onInit', function()
     MyPins = {};
     ElapsedDelta = 0;
@@ -11,7 +16,7 @@ registerForEvent('onInit', function()
 end)
 
 registerForEvent('onUpdate', function(timeDelta)
-    if Race then
+    if (Race) then
         if (not Race.Started) then
             Race.Started = PlayerIsInPosition(Race.Start);
             if (Race.Started) then
@@ -46,23 +51,27 @@ function GetRace() --Step 1
     Race = NewRace();
     Race.Start.pin = PlaceMapPinFromTable(Race.Start);
     table.insert(MyPins, Race.Start.pin);
+    HUDMessage('Found a Race, go there to start');
 end
 
 function StartRace() --Step 2
-    UnsetMappin(Race.Start.pin);
+    HUDMessage("The Race has started");
+    Race.Started = true;
     Race.End.pin = PlaceMapPinFromTable(Race.End);
     table.insert(MyPins, Race.End.pin);
-    print("The Race has started");
+    UnsetMappin(Race.Start.pin);
 end
 
 function EndRace() --Step 3
-    print('You won the Race');
-    UnsetMappins();
+    print('Race Ended');
+    HUDMessage('You won the Race');
+    UnsetMappin(Race.End.pin);
+    Race = nil;
 end
 
 function UnsetMappin(pin)
     Game.GetMappinSystem():UnregisterMappin(pin);
-    local PinIndex = IndexOf(pin);
+    local PinIndex = IndexOf(MyPins, pin);
     if (PinIndex ~= nil) then
         MyPins[PinIndex] = nil;
     end
@@ -129,4 +138,15 @@ function PlaceMapPin(x, y, z, w) -- from CET Snippets discord
 	mappinData.visibleThroughWalls = true
 
 	return Game.GetMappinSystem():RegisterMappin(mappinData, ToVector4{x=x, y=y, z=z, w=w} ) -- returns ID
+end
+
+function HUDMessage(msg) --from 'Hidden Packages' mod
+	if os:clock() - HUDMessage_Last <= 1 then
+		HUDMessage_Current = msg .. "\n" .. HUDMessage_Current
+	else
+		HUDMessage_Current = msg
+	end
+
+	GameHUD.ShowMessage(HUDMessage_Current)
+	HUDMessage_Last = os:clock()
 end
