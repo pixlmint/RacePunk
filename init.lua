@@ -28,10 +28,6 @@ registerForEvent('onUpdate', function(timeDelta)
                 EndRace();
             end
         end
-        --ElapsedDelta = ElapsedDelta + timeDelta
-        --if ElapsedDelta >= 0.5 then
-        --    ElapsedDelta = 0;
-        --end
     end
 end)
 
@@ -119,10 +115,6 @@ function GetPlayerPosition()
 	else
 		return nil
 	end
-end
-
-function CheckRaceFinished()
-    print('checking');
 end
 
 function PlaceMapPinFromTable(tbl)
