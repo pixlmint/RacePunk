@@ -66,6 +66,7 @@ function EndRace() --Step 3
     print('Race Ended');
     HUDMessage('You won the Race');
     UnsetMappin(Race.End.pin);
+	Game.AddToInventory("Items.money", Race.Reward);
     Race = nil;
 end
 
@@ -97,7 +98,7 @@ function NewRace()
     return {
         Start = {x = -1235.5713,y = 1536.0328,z = 22.620506,w = 1, pin = nil},
         End = {x = -1249.5834,y = 1457.5667,z = 20.801819,w = 1, pin = nil},
-        Reward = 0,
+        Reward = 1,
         Accepted = false,
         Started = false,
         Finished = false,
