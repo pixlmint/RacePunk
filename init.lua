@@ -51,15 +51,18 @@ registerHotkey('dev_set_start', 'Set this as the start point for a race', functi
         End = nil,
         Time = 0,
     }
+    HUDMessage('Started Recording');
 end)
 
 registerHotkey('dev_set_end', 'The race is finished here', function()
     MeasuringRace.End = GetPlayerPosition();
     print('START: ' .. CoordsToString(MeasuringRace.Start) .. "\nEnd: " .. CoordsToString(MeasuringRace.End) .. "\nTIME: " .. MeasuringRace.Time);
+    HUDMessage('Finished Recording');
 end)
 
 registerHotkey('dev_cancel_recording', 'Cancel recording a new race', function()
     MeasuringRace = nil;
+    HUDMessage('Cancelled Recording');
 end)
 
 function GetRace() --Step 1
