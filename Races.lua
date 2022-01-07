@@ -1,3 +1,11 @@
+--W: Watson
+--C: City Center
+--H: Heywood
+--P: Pacifica
+--B: Badlands
+--WB: Westbrook
+
+
 Races = {
     W1 = {
         Start = {x=-1515.2482910156, y=959.57470703125,z=23.913749694824,w=1},
