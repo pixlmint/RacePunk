@@ -7,6 +7,8 @@ local GameHUD = require('Modules/GameHUD.lua');
 local HUDMessage_Current = ""
 local HUDMessage_Last = 0
 
+local Races = require('Races.lua');
+
 registerForEvent('onInit', function()
     MyPins = {};
     ElapsedDelta = 0;
@@ -24,6 +26,7 @@ registerForEvent('onUpdate', function(timeDelta)
                 StartRace();
             end
         elseif (Race.Started) then
+            Race.ElapsedTime = Race.ElapsedTime + timeDelta;
             Race.Finished = PlayerIsInPosition(Race.End);
             if Race.Finished then
                 EndRace();
@@ -36,7 +39,7 @@ registerForEvent('onUpdate', function(timeDelta)
 end)
 
 registerHotkey('find_race', 'Find a new Race', function()
-    GetRace();
+    GetRace(GetRandomRace());
 end)
 
 registerHotkey('cancel_race', 'Cancel the current Race', function()
@@ -65,8 +68,30 @@ registerHotkey('dev_cancel_recording', 'Cancel recording a new race', function()
     HUDMessage('Cancelled Recording');
 end)
 
-function GetRace() --Step 1
-    Race = NewRace();
+function GetRandomRace()
+    math.randomseed(os.time())
+    local count = 0;
+    local keys = {};
+    local randomKey;
+    for _ in pairs(Races) do count = count + 1 end
+    local randomKeyIndex = math.random(count);
+    for k, r in pairs(Races) do
+        table.insert(keys, k);
+    end
+    randomKey = Races[keys[randomKeyIndex]];
+    return randomKey;
+end
+
+function GetRace(r) --Step 1
+    if (r) then
+        Race = r;
+        Race.Accepted = false;
+        Race.Started = false;
+        Race.Finished = false;
+        Race.ElapsedTime = 0;
+    else
+        Race = NewRace();
+    end
     Race.Start.pin = PlaceMapPinFromTable(Race.Start);
     table.insert(MyPins, Race.Start.pin);
     HUDMessage('Found a Race, go there to start');
@@ -120,6 +145,7 @@ function NewRace()
         Accepted = false,
         Started = false,
         Finished = false,
+        ElapsedTime = 0;
     }
 end
 
